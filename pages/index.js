@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import {connect} from "react-redux";
 import {bindActionCreators} from 'redux';
 import Link from 'next/link';
+import { Button } from 'semantic-ui-react'
 
 import {
     fetchProjects,
@@ -16,17 +17,30 @@ class Index extends Component {
      */
     static async getInitialProps({store, isServer}) {
 
-        store.dispatch(fetchProjects())
+        await store.execSagaTasks(isServer, dispatch => {
+            dispatch(fetchProjects());
+        });
 
-        return {staticData: 'Hello world!'};
+        console.log('');
+        console.log('###############################');
+        console.log('### Fetched today NASA APOD ###');
+        console.log('###############################');
+        console.log(store.getState().project.projectList);
+        console.log('');
+
+        return {
+            projectList: store.getState().project.projectList,
+            projectDetails: store.getState().project.projectDetails
+        };
     }
 
     render() {
 
-        console.log(this.props.projectList)
+        console.log(this.props)
         return (
             <div>
                 <div>Prop from getInitialProps {this.props.custom}</div>
+                <Button>Click Here</Button>
                 <Link as={'/page'} href={`/page`}>
                     <a>To Page</a>
                 </Link>

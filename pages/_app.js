@@ -2,35 +2,23 @@ import React from "react";
 import {Provider} from "react-redux";
 import App, {Container} from "next/app";
 import withRedux from "next-redux-wrapper";
-import withReduxSaga from 'next-redux-saga';
-import reducer from '../reducers';
-import rootSaga, { sagaMiddleware } from '../rootSagas';
-import { applyMiddleware, createStore } from "redux";
-
-
-const makeStore = (initialState, options) => {
-    const store = createStore(reducer, applyMiddleware(sagaMiddleware));
-    sagaMiddleware.run(rootSaga);
-    return store;
-};
-
+import makeStore from '../store';
 
 class MyApp extends App {
 
     static async getInitialProps({Component, ctx}) {
-        let pageProps = {}
-
-        if (Component.getInitialProps) {
-            pageProps = await Component.getInitialProps(ctx)
-        }
-
-        return {pageProps}
+        const pageProps = Component.getInitialProps ? await Component.getInitialProps(ctx) : {};
+        return { pageProps };
     }
 
     render() {
         const {Component, pageProps, store} = this.props;
         return (
             <Container>
+                <link
+                    rel="stylesheet"
+                    href="//cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.3.3/semantic.min.css"
+                />
                 <Provider store={store}>
                     <Component {...pageProps} />
                 </Provider>
@@ -40,4 +28,4 @@ class MyApp extends App {
 
 }
 
-export default withRedux(makeStore)(withReduxSaga(MyApp));
+export default withRedux(makeStore)(MyApp);
